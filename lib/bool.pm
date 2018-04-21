@@ -3,28 +3,26 @@ use warnings;
 package bool;
 
 use Scalar::Util ();
-
-use strict;
-use overload (
-    "0+"     => sub { ${$_[0]} },
-    "++"     => sub { $_[0] = ${$_[0]} + 1 },
-    "--"     => sub { $_[0] = ${$_[0]} - 1 },
-    fallback => 1,
-);
-
 use Exporter ();
 BEGIN { @bool::ISA = ('Exporter') }
 
-our ($TRUE, $FALSE);
 our @EXPORT_OK = qw/ true false /;
+
+use overload (
+    "0+"     => \&stringify,
+    "++"     => \&plus,
+    "--"     => \&minus,
+    fallback => 1,
+);
 
 sub new {
     my ($class, $num) = @_;
+    $num = $num ? 1 : 0;
     return bless \$num, $class;
 }
 
-$TRUE = bool->new(1);
-$FALSE = bool->new(0);
+my $TRUE = bool->new(1);
+my $FALSE = bool->new(0);
 
 sub true { $TRUE }
 sub false { $FALSE }
@@ -35,6 +33,22 @@ sub is_bool {
 
 sub complement {
     $_[0] ? $FALSE : $TRUE
+}
+
+sub stringify {
+    ${ $_[0] }
+}
+
+sub plus {
+    $_[0] = ${ $_[0] } + 1
+}
+
+sub minus {
+    $_[0] = ${ $_[0] } - 1
+}
+
+sub perl {
+    ${ $_[0] } ? 1 : ''
 }
 
 1;
