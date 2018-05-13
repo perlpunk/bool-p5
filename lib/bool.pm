@@ -5,13 +5,15 @@ package bool;
 use Exporter ();
 BEGIN { @bool::ISA = ('Exporter') }
 
+our $VERSION = '0.001';
+
 our @EXPORT_OK = qw/ true false /;
 push @JSON::PP::Boolean::ISA, qw/ bool /;
 
 use overload (
-    "0+"     => \&_stringify,
-    "++"     => \&_plus,
-    "--"     => \&_minus,
+    "0+"     => \&stringify,
+    "++"     => \&plus_one,
+    "--"     => \&minus_one,
     fallback => 1,
 );
 
@@ -28,12 +30,11 @@ sub true { $TRUE }
 sub false { $FALSE }
 
 BEGIN {
-    eval 'require Scalar::Util';
-    unless($@) {
+    eval 'require Scalar::Util; 1';
+    unless (eval { require Scalar::Util; 1 }) {
         *bool::blessed = \&Scalar::Util::blessed;
     }
     else { # This code is from Scalar::Util.
-        # warn $@;
         eval 'sub UNIVERSAL::a_sub_not_likely_to_be_here { ref($_[0]) }';
         *bool::blessed = sub {
             local($@, $SIG{__DIE__}, $SIG{__WARN__});
@@ -50,15 +51,15 @@ sub complement {
     $_[0] ? $FALSE : $TRUE
 }
 
-sub _stringify {
+sub stringify {
     ${ $_[0] }
 }
 
-sub _plus {
+sub plus_one {
     $_[0] = ${ $_[0] } + 1
 }
 
-sub _minus {
+sub minus_one {
     $_[0] = ${ $_[0] } - 1
 }
 
