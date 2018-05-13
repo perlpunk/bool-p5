@@ -30,7 +30,6 @@ sub true { $TRUE }
 sub false { $FALSE }
 
 BEGIN {
-    eval 'require Scalar::Util; 1';
     unless (eval { require Scalar::Util; 1 }) {
         *bool::blessed = \&Scalar::Util::blessed;
     }
