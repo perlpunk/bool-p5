@@ -6,8 +6,7 @@ use Exporter ();
 BEGIN { @bool::ISA = ('Exporter') }
 
 our @EXPORT_OK = qw/ true false /;
-require JSON::PP;
-@JSON::PP::Boolean::ISA = qw/ bool /;
+push @JSON::PP::Boolean::ISA, qw/ bool /;
 
 use overload (
     "0+"     => \&_stringify,
@@ -28,8 +27,23 @@ my $FALSE = do { bless \(my $dummy = 0), "JSON::PP::Boolean" };
 sub true { $TRUE }
 sub false { $FALSE }
 
+BEGIN {
+    eval 'require Scalar::Util';
+    unless($@) {
+        *bool::blessed = \&Scalar::Util::blessed;
+    }
+    else { # This code is from Scalar::Util.
+        # warn $@;
+        eval 'sub UNIVERSAL::a_sub_not_likely_to_be_here { ref($_[0]) }';
+        *bool::blessed = sub {
+            local($@, $SIG{__DIE__}, $SIG{__WARN__});
+            ref($_[0]) ? eval { $_[0]->a_sub_not_likely_to_be_here } : undef;
+        };
+    }
+}
+
 sub is_bool {
-    JSON::PP::is_bool(@_);
+    blessed $_[0] and $_[0]->isa("bool");
 }
 
 sub complement {
@@ -51,5 +65,6 @@ sub _minus {
 sub perl {
     ${ $_[0] } ? 1 : ''
 }
+
 
 1;

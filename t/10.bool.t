@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 11;
+use Test::More tests => 14;
 
 use bool;
 use Data::Dumper;
@@ -25,3 +25,12 @@ cmp_ok("$false", 'eq', 0, "\$false eq 0");
 
 cmp_ok($true->perl, 'eq', 1, "\$true->perl eq 1");
 cmp_ok($false->perl, 'eq', '', "\$false->perl eq ''");
+
+my $isa = bool::is_bool($true) ? 1 : 0;
+ok($isa, "\$true is a bool");
+
+$isa = bool::is_bool(bless {}, 'Nonsense') ? 1 : 0;
+ok(! $isa, "some object is not a bool");
+
+$isa = bool::is_bool(\{ foo => 'bar' }) ? 1 : 0;
+ok(! $isa, "some ref is not a bool");
