@@ -12,8 +12,8 @@ push @JSON::PP::Boolean::ISA, qw/ bool /;
 
 use overload (
     "0+"     => \&stringify,
-    "++"     => \&plus_one,
-    "--"     => \&minus_one,
+    "++"     => \&_plus_one,
+    "--"     => \&_minus_one,
     fallback => 1,
 );
 
@@ -31,11 +31,11 @@ sub false { $FALSE }
 
 BEGIN {
     unless (eval { require Scalar::Util; 1 }) {
-        *bool::blessed = \&Scalar::Util::blessed;
+        *bool::_blessed = \&Scalar::Util::blessed;
     }
     else { # This code is from Scalar::Util.
         eval 'sub UNIVERSAL::a_sub_not_likely_to_be_here { ref($_[0]) }';
-        *bool::blessed = sub {
+        *bool::_blessed = sub {
             local($@, $SIG{__DIE__}, $SIG{__WARN__});
             ref($_[0]) ? eval { $_[0]->a_sub_not_likely_to_be_here } : undef;
         };
@@ -43,7 +43,7 @@ BEGIN {
 }
 
 sub is_bool {
-    blessed $_[0] and $_[0]->isa("bool");
+    _blessed $_[0] and $_[0]->isa("bool");
 }
 
 sub complement {
@@ -54,11 +54,11 @@ sub stringify {
     ${ $_[0] }
 }
 
-sub plus_one {
+sub _plus_one {
     $_[0] = ${ $_[0] } + 1
 }
 
-sub minus_one {
+sub _minus_one {
     $_[0] = ${ $_[0] } - 1
 }
 
