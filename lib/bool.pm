@@ -10,10 +10,16 @@ use Scalar::Util ();
 
 our @EXPORT_OK = qw/ true false is_bool /;
 
+# for historical reasons
+push @bool::ISA, qw/ JSON::PP::Boolean /;
+# otherwise we get a complaint that the package does not exist, if it isn't
+# used
+$JSON::PP::Boolean::_dummy_variable = 23;
+
 use overload (
     "0+"     => \&stringify,
-    "++"     => \&plus_one,
-    "--"     => \&minus_one,
+    "++"     => \&_plus_one,
+    "--"     => \&_minus_one,
     fallback => 1,
 );
 
@@ -25,8 +31,8 @@ sub new {
 my $TRUE = do { bless \(my $dummy = 1), 'bool' };
 my $FALSE = do { bless \(my $dummy = 0), 'bool' };
 
-sub true { $TRUE }
-sub false { $FALSE }
+sub true() { $TRUE }
+sub false() { $FALSE }
 
 sub is_bool {
     Scalar::Util::blessed($_[0]) and $_[0]->isa('bool');
@@ -40,11 +46,11 @@ sub stringify {
     ${ $_[0] }
 }
 
-sub plus_one {
+sub _plus_one {
     $_[0] = ${ $_[0] } + 1
 }
 
-sub minus_one {
+sub _minus_one {
     $_[0] = ${ $_[0] } - 1
 }
 
