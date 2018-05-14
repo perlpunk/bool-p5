@@ -2,6 +2,13 @@ use strict;
 use warnings;
 package bool;
 
+# WIP
+# A replacement for JSON::PP::Boolean
+# This would work for any module checking for isa('JSON::PP::Boolean')
+# without changing anything
+# But apparently JSON::XS, Cpanel::JSON::XS, JSON::Tiny and Mojo::JSON are
+# checking the ref() directly. Only JSON::PP works with this out of the box
+
 our $VERSION = '0.001';
 
 use base 'Exporter';
