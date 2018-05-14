@@ -8,7 +8,7 @@ use base 'Exporter';
 
 use Scalar::Util ();
 
-our @EXPORT_OK = qw/ true false /;
+our @EXPORT_OK = qw/ true false is_bool /;
 
 use overload (
     "0+"     => \&stringify,
